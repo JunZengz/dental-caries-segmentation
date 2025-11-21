@@ -4,6 +4,24 @@ import cv2
 import numpy as np
 from torch.utils.data import Dataset
 
+
+def load_DC1000_data(path):
+    def get_data(path):
+        images = sorted(glob(os.path.join(path, "images", "*.png")))
+        labels = sorted(glob(os.path.join(path, "masks", "*.png")))
+        return images, labels
+
+    train_path = os.path.join(path, "train")
+    valid_path = os.path.join(path, "valid")
+    test_path = os.path.join(path, "test")
+
+    train_x, train_y = get_data(train_path)
+    valid_x, valid_y = get_data(valid_path)
+    test_x, test_y = get_data(test_path)
+
+    return [(train_x, train_y), (valid_x, valid_y), (test_x, test_y)]
+
+
 def load_LiTS_data(path):
     def get_data(path, name):
         images = sorted(glob(os.path.join(path, name, "images", "*.jpg")))
@@ -91,6 +109,40 @@ def load_CirrMRI_data(path):
         test_y += y
 
     return [(train_x, train_y), (valid_x, valid_y), (test_x, test_y)]
+
+
+class DC1000_DATASET(Dataset):
+    def __init__(self, images_path, masks_path, size, transform=None):
+        super().__init__()
+
+        self.images_path = images_path
+        self.masks_path = masks_path
+        self.size = size
+        self.transform = transform
+        self.n_samples = len(images_path)
+
+    def __getitem__(self, index):
+        """ Image """
+        image = cv2.imread(self.images_path[index], cv2.IMREAD_COLOR)
+        mask = cv2.imread(self.masks_path[index], cv2.IMREAD_GRAYSCALE)
+
+        if self.transform is not None:
+            augmentations = self.transform(image=image, mask=mask)
+            image = augmentations["image"]
+            mask = augmentations["mask"]
+
+        image = cv2.resize(image, self.size, interpolation=cv2.INTER_NEAREST)
+        image = np.transpose(image, (2, 0, 1))
+        image = image / 255.0
+
+        mask = cv2.resize(mask, self.size, interpolation=cv2.INTER_NEAREST)
+        mask = (mask > 127).astype(np.float32)
+        mask = np.expand_dims(mask, axis=0)
+
+        return image, mask
+
+    def __len__(self):
+        return self.n_samples
 
 
 class DATASET(Dataset):
