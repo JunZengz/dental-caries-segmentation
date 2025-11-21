@@ -48,6 +48,10 @@ Please cite our paper if you find the work useful:
 }
 ```
 
+## Acknowledgment
+This project is built upon DoubleUnet ([paper](https://arxiv.org/abs/2006.04868), [code](https://github.com/DebeshJha/2020-CBMS-DoubleU-Net)), ColonSegNet ([paper](https://arxiv.org/abs/2011.07631), [code](https://github.com/DebeshJha/ColonSegNet)), U-Net ([paper](https://arxiv.org/abs/1505.04597), [code](https://github.com/bigmb/Unet-Segmentation-Pytorch-Nest-of-Unets/tree/master)), ResUNet++ ([paper](https://arxiv.org/abs/1911.07067), [code](https://github.com/DebeshJha/ResUNetPlusPlus)), VMUNet ([paper](https://arxiv.org/abs/2402.02491), [code](https://github.com/JCruan519/VM-UNet)), VMUNetV2 ([paper](https://arxiv.org/abs/2402.02491), [code](https://github.com/JCruan519/VM-UNet)), Mamba-UNet ([paper](https://arxiv.org/abs/2402.05079), [code](https://github.com/ziyangwang007/Mamba-UNet)), RMAMamba ([paper](https://arxiv.org/abs/2502.18232), [code](https://github.com/JunZengz/RMAMamba)), PVTFormer ([paper](https://arxiv.org/abs/2401.09630), [code](https://github.com/DebeshJha/PVTFormer)), TransRUPNet ([paper](https://arxiv.org/abs/2306.02176), [code](https://github.com/DebeshJha/TransRUPNet)), TransNetR ([paper](https://arxiv.org/abs/2303.07428), [code](https://github.com/DebeshJha/TransNetR)), RSAFormer ([paper](https://www.sciencedirect.com/science/article/pii/S0010482524003524), [code](https://github.com/JunZengz/RSAFormer)). 
+We gratefully acknowledge the authors for their excellent work and for sharing their code in the open-source community. 
+
 ## Contact
 
 Please contact zeng.cqupt@gmail.com for any further questions.
