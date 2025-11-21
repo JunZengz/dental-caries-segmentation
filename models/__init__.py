@@ -6,5 +6,5 @@ from .PvtFormer import PVTFormer
 from .TransRUPNet import TransRUPNet
 from .ResunetPlusplus import ResunetPlusplus
 from .MDNet import MDNet
-from .RSAFormer.RSAFormer import RSAFormer
+# from .RSAFormer.RSAFormer import RSAFormer
 from .FocusNet.FocusNet import FocusNet
