@@ -317,8 +317,8 @@ if __name__ == "__main__":
     ])
 
     """ Dataset and loader """
-    train_dataset = DATASET(train_x, train_y, size, transform=transform)
-    valid_dataset = DATASET(valid_x, valid_y, size, transform=None)
+    train_dataset = DC1000_DATASET(train_x, train_y, size, transform=transform)
+    valid_dataset = DC1000_DATASET(valid_x, valid_y, size, transform=None)
 
     train_loader = DataLoader(
         dataset=train_dataset,
