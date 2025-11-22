@@ -17,49 +17,6 @@ from configs.model_configs import build_VMUnetV2 as VMUnetV2
 from configs.model_configs import build_MambaUnet as MambaUnet
 from models import *
 
-def load_CirrMRI_data(path):
-    def get_data(path, name):
-        images = sorted(glob(os.path.join(path, name, "images", "*.png")))
-        labels = sorted(glob(os.path.join(path, name, "masks", "*.png")))
-        return images, labels
-
-    """ Names """
-    train_path = f"{path}/train"
-    valid_path = f"{path}/valid"
-    test_path = f"{path}/test"
-
-    train_dirs = sorted(os.listdir(train_path))
-    valid_dirs = sorted(os.listdir(valid_path))
-    test_dirs = sorted(os.listdir(test_path))
-
-    train_names = [item for item in train_dirs]
-    valid_names = [item for item in valid_dirs]
-    test_names = [item for item in test_dirs]
-
-    """ Training data """
-    train_x, train_y = [], []
-    for name in train_names:
-        x, y = get_data(train_path, name)
-        train_x += x
-        train_y += y
-
-    """ Validation data """
-    valid_x, valid_y = [], []
-    for name in valid_names:
-        x, y = get_data(valid_path, name)
-        valid_x += x
-        valid_y += y
-
-    """ Testing data """
-    test_x, test_y = [], []
-    for name in test_names:
-        x, y = get_data(test_path, name)
-        test_x += x
-        test_y += y
-
-    return [(train_x, train_y), (valid_x, valid_y), (test_x, test_y)]
-
-
 def load_DC1000_data(path):
     def get_data(path):
         images = sorted(glob(os.path.join(path, "images", "*.png")))
@@ -75,7 +32,6 @@ def load_DC1000_data(path):
     test_x, test_y = get_data(test_path)
 
     return [(train_x, train_y), (valid_x, valid_y), (test_x, test_y)]
-
 
 
 class DC1000_DATASET(Dataset):
@@ -98,12 +54,6 @@ class DC1000_DATASET(Dataset):
             image = augmentations["image"]
             mask = augmentations["mask"]
 
-        # image = cv2.resize(image, self.size)
-        # image = np.transpose(image, (2, 0, 1))
-        # mean = np.array([0.485, 0.456, 0.406], dtype=np.float32).reshape((3, 1, 1))
-        # std = np.array([0.229, 0.224, 0.225], dtype=np.float32).reshape((3, 1, 1))
-        # image = (image - mean) / std
-
         image = cv2.resize(image, self.size, interpolation=cv2.INTER_NEAREST)
         image = np.transpose(image, (2, 0, 1))
         image = image / 255.0
@@ -111,41 +61,6 @@ class DC1000_DATASET(Dataset):
         mask = cv2.resize(mask, self.size, interpolation=cv2.INTER_NEAREST)
         mask = (mask > 127).astype(np.float32)
         mask = np.expand_dims(mask, axis=0)
-
-        return image, mask
-
-    def __len__(self):
-        return self.n_samples
-
-
-class DATASET(Dataset):
-    def __init__(self, images_path, masks_path, size, transform=None):
-        super().__init__()
-
-        self.images_path = images_path
-        self.masks_path = masks_path
-        self.size = size
-        self.transform = transform
-        self.n_samples = len(images_path)
-
-    def __getitem__(self, index):
-        """ Image """
-        image = cv2.imread(self.images_path[index], cv2.IMREAD_COLOR)
-        mask = cv2.imread(self.masks_path[index], cv2.IMREAD_GRAYSCALE)
-
-        if self.transform is not None:
-            augmentations = self.transform(image=image, mask=mask)
-            image = augmentations["image"]
-            mask = augmentations["mask"]
-
-        image = cv2.resize(image, self.size)
-        image = np.transpose(image, (2, 0, 1))
-        image = image/255.0
-
-        mask = cv2.resize(mask, self.size)
-        mask = np.expand_dims(mask, axis=0)
-        mask = mask/255.0
-        # mask = mask > 0.5
 
         return image, mask
 
@@ -165,12 +80,6 @@ def train(model, loader, optimizer, device):
     for i, (x, y) in enumerate(loader):
         x = x.to(device, dtype=torch.float32)
         y = y.to(device, dtype=torch.float32)
-
-        # mask_np = y.cpu().numpy()
-        # # 批量打印每个 mask 的唯一值
-        # for idx in range(mask_np.shape[0]):  # 遍历 batch
-        #     unique_vals = np.unique(mask_np[idx])
-        #     print(f"Mask #{idx} unique values: {unique_vals}")
 
         optimizer.zero_grad()
         sample = {'images': x, 'masks': y}
@@ -207,6 +116,7 @@ def train(model, loader, optimizer, device):
     epoch_precision = epoch_precision/len(loader)
 
     return epoch_loss, [epoch_jac, epoch_f1, epoch_recall, epoch_precision]
+
 
 def evaluate(model, loader, device):
     model.eval()
@@ -255,6 +165,7 @@ def evaluate(model, loader, device):
         epoch_precision = epoch_precision/len(loader)
 
         return epoch_loss, [epoch_jac, epoch_f1, epoch_recall, epoch_precision]
+
 
 if __name__ == "__main__":
     """ Seeding """
